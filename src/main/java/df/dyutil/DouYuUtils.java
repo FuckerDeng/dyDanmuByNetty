@@ -147,13 +147,13 @@ public class DouYuUtils {
      * @param offset
      * @return
      */
-    private static int bytes2bigInt(byte[] dataLen, int offset) {
+    public static int bytes2bigInt(byte[] dataLen, int offset) {
         int resulteInt = 0;
         resulteInt = (int)((dataLen[offset] & 0xff)| ((dataLen[offset+1] & 0xff)<< 8) |((dataLen[offset+2] & 0xff)<<16) |((dataLen[offset+3] & 0xff)<<24));
         return resulteInt;
     }
 
-    private static byte[] readFromStream(ByteBuf msgBuffer, int offset, int dataLength) {
+    public static byte[] readFromStream(ByteBuf msgBuffer, int offset, int dataLength) {
         byte[] result  = new byte[dataLength];
         try {
             msgBuffer.readBytes(result,offset,dataLength);
