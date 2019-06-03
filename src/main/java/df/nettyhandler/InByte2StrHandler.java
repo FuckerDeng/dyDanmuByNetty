@@ -27,11 +27,11 @@ public class InByte2StrHandler extends SimpleChannelInboundHandler<ByteBuf> {
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
         System.out.println("channelActive");
         //登录斗鱼弹幕服务器
-        DouYuUtils.connectDouyuDanmu(4615502,ctx);
+        DouYuUtils.connectDouyuDanmu(1761021,ctx);
 
 
         //加入弹幕房间分组-999
-        DouYuUtils.joinDanmuGroup(4615502,ctx);
+        DouYuUtils.joinDanmuGroup(1761021,ctx);
 //        super.channelActive(ctx);
     }
 

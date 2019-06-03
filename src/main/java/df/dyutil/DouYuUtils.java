@@ -94,7 +94,12 @@ public class DouYuUtils {
             //获得第一个长度
             byte[] dataLen1 = readFromStream(msgBuffer,0,4);
             int packageDataLen1 = bytes2bigInt(dataLen1,0);
-//            System.out.println("数据长度为："+packageDataLen1);
+//            System.out.println("数据长度为："+packageDataLen1+"\tByteBuf的字节数为："+msgBuffer.readableBytes()+"\t读位置为："+msgBuffer.readerIndex());
+            if(packageDataLen1<msgBuffer.readableBytes()){
+                System.out.println("接收包的长度大于单个数据的长度，出现粘包现象！");
+            }else if(packageDataLen1>msgBuffer.readableBytes()){
+                System.out.println("接收包的长度小于单个数据的长度，出现半包现象！");
+            }
             if(packageDataLen1>=2048){
                 System.out.println("解析出数据长度异常！");
                 System.out.println(msgBuffer.toString(Charset.defaultCharset()));
