@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--日志级别以及优先级排序: OFF > FATAL > ERROR > WARN > INFO > DEBUG > TRACE > ALL -->
+<!--Configuration后面的status，这个用于设置log4j2自身内部的信息输出，可以不设置，当设置成trace时，你会看到log4j2内部各种详细输出-->
+<!--monitorInterval：Log4j能够自动检测修改配置 文件和重新配置本身，设置间隔秒数-->
+<Configuration status="warn" monitorInterval="30">
+    <!--appenders指定日志输出的位置，有3种：Console:控制台输出；File：单文件输出;RollingFile：根据时间或大小策略多文件输出-->
+    <Appenders>
+        <!--name属性用于下方Logger中进行引用，名字随意，控制台的target有2个，输出流SYSTEM_OUT和错误流SYSTEM_ERROR-->
+        <Console name="Console" target="SYSTEM_OUT">
+            <!--PatternLayout用于指定输出格式-->
+            <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] [%-5level] %logger{36} -> %msg%n"/>
+        </Console>
+
+        <!--&lt;!&ndash;这个log每次运行程序会自动清空，由append属性决定，这个也挺有用的，适合临时测试用&ndash;&gt;-->
+        <!--<File name="File" append="false">-->
+            <!--&lt;!&ndash;fileName指定要输出的文件全路径&ndash;&gt;-->
+            <!--<fileName>"${sys:logPath}/logs/warn.log"</fileName>-->
+            <!--<PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>-->
+        <!--</File>-->
+
+
+        <RollingFile name="rollingFile" append="false">
+            <!--发现log4j2确实有自己读取变量的规则，简单介绍一下常用的几个 -->
+            <!--date  可以按照特定的格式插入当前日期/时间  -->
+            <!--env 可以读取系统的环境变量   -->
+            <!--jvmrunargs 可以读取jvm启动时设定的运行参数，但是不能读main函数的参数，在Android系统上也不能用  -->
+            <!--sys 读取的是 system properties的属性-->
+            <!--配置日志路径时，可以程序运行的时候（log4j加载前），日志路径设置进properties，然后再配置文件中通过-->
+            <!--sys:配置的路径 进行获取-->
+            <!--比如：System.getProperties().setProperty("logPath",System.getProperties("user.dir")+File.separator+"logs")-->
+            <!--fileName指定当前写入的日志文件（最新日志文件）的名字,如果路径配置在标签内，则不需要加双引号，如果是属性，则需要加双引号-->
+            <!--如下就是错误的-->
+            <!--<fileName>"${sys:logPath}/logs/warn.log"</fileName>-->
+            <fileName>${sys:user.dir}/logs/log.log</fileName>
+            <!--filePattern指定当分文件时，旧文件的命名规则-->
+            <filePattern>${sys:user.dir}/logs/$${date:yyyy-MM}/error-%d{yyyy-MM-dd}-%i.log</filePattern>
+            <!--<filePattern>"${sys:user.dir}/logs/$${date:yyyy-MM}/error-%d{yyyy-MM-dd}-%i.log"</filePattern>-->
+            <!--日志等级过滤，等于设置等级，onMathch为Accept则会接受日志并处理，不匹配的则丢弃，这个标签再查下文档-->
+            <ThresholdFilter level="info" onMatch="ACCEPT" onMismatch="DENY"/>
+            <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] [%-5level] %logger{36} -> %msg%n"/>
+            <Policies>
+                <!--//每天24点分文件-->
+                <TimeBasedTriggeringPolicy modulate="true" interval="24"></TimeBasedTriggeringPolicy>
+                <!--//超过100M则分文件-->
+                <!--<SizeBasedTriggeringPolicy size="100 M"></SizeBasedTriggeringPolicy>-->
+            </Policies>
+            <!--//日志文件夹下的文件数量超过max后会删除最旧的日志文件-->
+            <DefaultRolloverStrategy max="10"></DefaultRolloverStrategy>
+        </RollingFile>
+    </Appenders>
+
+    <!--Loggers控制需要输出的级别和内容，有2种：Root和Logger-->
+    <!--Root是日志的根，所有子日志都继承root-->
+    <Loggers>
+        <!--level:日志输出级别，共有8个级别，按照从低到高为：All < Trace < Debug < Info < Warn < Error < Fatal < OFF.-->
+        <Root level="info">
+            <AppenderRef ref="Console"/>
+            <AppenderRef ref="rollingFile"/>
+        </Root>
+
+        <!--<Logger level="info">-->
+            <!--&lt;!&ndash;用来指定该Logger所适用的类或者类所在的包全路径,继承自Root节点.&ndash;&gt;-->
+            <!--<name></name>-->
+            <!--&lt;!&ndash;Logger的子节点，用来指定该日志输出到哪个Appender,如果没有指定，就会默认继承自Root.如果指定了，那么会在指定的-->
+            <!--这个Appender和Root的Appender中都会输出，此时我们可以设置Logger的additivity="false"只在自定义的Appender中进行输出。&ndash;&gt;-->
+            <!--<AppenderRef></AppenderRef>-->
+        <!--</Logger>-->
+    </Loggers>
+</Configuration>
