@@ -18,7 +18,7 @@ public class DouYuUtils {
      */
     public static void connectDouyuDanmu(int roomId, ChannelHandlerContext ctx) {
         String loginApi = String.format("type@=loginreq/roomid@=%d/",roomId);
-        System.out.println(loginApi);
+//        System.out.println(loginApi);
         byte[] resultData =sendData(loginApi);
         if(resultData == null){
             System.out.println("发送数据编码失败！");
@@ -127,8 +127,8 @@ public class DouYuUtils {
             };
             byte[] bytes = new byte[contentLen];
             ByteArrayOutputStream msgos = new ByteArrayOutputStream();
-            System.out.println(packageDataLen1);
-            System.out.println("实际长度："+contentLen);
+//            System.out.println(packageDataLen1);
+//            System.out.println("实际长度："+contentLen);
             msgBuffer.readBytes(bytes, 0, contentLen);
             msgos.write(bytes,0,contentLen);
 //            while ((len = msgBuffer.readBytes(bytes, 0, contentLen - readLen)) != -1) {
