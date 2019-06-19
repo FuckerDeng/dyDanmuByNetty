@@ -29,6 +29,8 @@ public class MsgParse extends Thread{
 
             if(msg!=null){
                 MsgManger.pushHandedMsg(msg);
+//                if(msg.getType()=="dgb") System.out.println("礼物消息放入入库队列");
+
             }
 
         }
@@ -65,6 +67,7 @@ public class MsgParse extends Thread{
     }
 
     public void initValue(HashMap<String,Object> keyValues,Msg msg,Class clazz){
+        msg.setType((String) keyValues.get("type"));
         Field[] declaredFields = clazz.getDeclaredFields();
         Set<String> keys = keyValues.keySet();
         for(Field f : declaredFields){

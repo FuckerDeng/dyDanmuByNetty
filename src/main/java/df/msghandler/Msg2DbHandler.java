@@ -18,7 +18,8 @@ public class Msg2DbHandler extends Thread {
             if(handedMsg == null) {
                 continue;
             }
-            if(handedMsg instanceof GiftMsg){
+
+            if(handedMsg.getType().equals("dgb")){
                 GiftMsg giftMsg = (GiftMsg) handedMsg;
                 GiftInfo giftInfo = GiftManager.giftContainner.get(giftMsg.getGfid()+"");
                 if(giftInfo ==null){
@@ -52,6 +53,7 @@ public class Msg2DbHandler extends Thread {
 
                 }catch (Exception e){
                     sqlSession.rollback();
+                    e.printStackTrace();
                 }finally {
                     sqlSession.close();
                 }

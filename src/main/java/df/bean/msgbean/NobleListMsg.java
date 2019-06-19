@@ -6,4 +6,5 @@ public class NobleListMsg extends Msg {
     //抢到的道具数量
     private int cnt;
 
+
 }
