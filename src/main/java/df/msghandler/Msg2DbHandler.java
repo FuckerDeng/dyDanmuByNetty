@@ -54,7 +54,7 @@ public class Msg2DbHandler extends Thread {
                     if(giftrecord.getIsfree()==0){
                         logger.info(String.format("%s  赠送免费礼物：%s  %d个",giftrecord.getNn(),giftrecord.getGfname(),giftrecord.getGfcnt()));
                     }else{
-                        logger.info(String.format("%s  赠送收费礼物：%s  %d个，价值 %.2f元",giftrecord.getNn(),giftrecord.getGfname(),giftrecord.getGfcnt(),giftrecord.getJiage()));
+                        logger.info(String.format("%s  赠送收费礼物：%s  %d个，价值 %.2f元",giftrecord.getNn(),giftrecord.getGfname(),giftrecord.getGfcnt(),giftrecord.getJiage()*giftrecord.getGfcnt()));
                     }
 
                 }catch (Exception e){
