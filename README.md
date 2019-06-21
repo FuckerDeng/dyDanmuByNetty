@@ -3,7 +3,7 @@
 ### 程序运行
 ```
 1、下载可执行jar包：
--下载项目根目录的jar包：dyDanmuByNetty-1.0-SNAPSHOT.jar
+-下载发布版本中的jar包：dyDanmuByNetty-*.0-SNAPSHOT.jar
 
 2、新建配置文件目录：
 -在jar包的同级目录新建config目录，并把项目config目录中的
