@@ -1,4 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
+
+<!--log4j2基本依赖-->
+<!-- https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-core -->
+<!--<dependency>-->
+    <!--<groupId>org.apache.logging.log4j</groupId>-->
+    <!--<artifactId>log4j-core</artifactId>-->
+    <!--<version>2.11.2</version>-->
+<!--</dependency>-->
+
+        <!--&lt;!&ndash; https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-api &ndash;&gt;-->
+<!--<dependency>-->
+<!--<groupId>org.apache.logging.log4j</groupId>-->
+<!--<artifactId>log4j-api</artifactId>-->
+<!--<version>2.11.2</version>-->
+<!--</dependency>-->
+
 <!--日志级别以及优先级排序: OFF > FATAL > ERROR > WARN > INFO > DEBUG > TRACE > ALL -->
 <!--Configuration后面的status，这个用于设置log4j2自身内部的信息输出，可以不设置，当设置成trace时，你会看到log4j2内部各种详细输出-->
 <!--monitorInterval：Log4j能够自动检测修改配置 文件和重新配置本身，设置间隔秒数-->
@@ -33,19 +50,21 @@
             <!--<fileName>"${sys:logPath}/logs/warn.log"</fileName>-->
             <fileName>${sys:user.dir}/logs/log.log</fileName>
             <!--filePattern指定当分文件时，旧文件的命名规则-->
-            <filePattern>${sys:user.dir}/logs/$${date:yyyy-MM}/error-%d{yyyy-MM-dd}-%i.log</filePattern>
+            <!--注意文件的时间精确问题，如果精确到dd，则是每天新建一个文件，精确到HH，则是每小时新建一个文件，精确到mm则是每分钟分一个文件-->
+            <!--<filePattern>${sys:user.dir}/logs/$${date:yyyy-MM}/error-%d{yyyy-MM-dd HH-mm}-%i.log</filePattern>-->
             <!--<filePattern>"${sys:user.dir}/logs/$${date:yyyy-MM}/error-%d{yyyy-MM-dd}-%i.log"</filePattern>-->
+            <filePattern>${sys:user.dir}/logs/$${date:yyyy-MM}/log.%d{yyyyMMdd-HH}</filePattern>
             <!--日志等级过滤，等于设置等级，onMathch为Accept则会接受日志并处理，不匹配的则丢弃，这个标签再查下文档-->
             <ThresholdFilter level="info" onMatch="ACCEPT" onMismatch="DENY"/>
             <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] [%-5level] %logger{36} -> %msg%n"/>
             <Policies>
                 <!--//每天24点分文件-->
-                <TimeBasedTriggeringPolicy modulate="true" interval="24"></TimeBasedTriggeringPolicy>
+                <TimeBasedTriggeringPolicy modulate="false" interval="1"></TimeBasedTriggeringPolicy>
                 <!--//超过100M则分文件-->
                 <!--<SizeBasedTriggeringPolicy size="100 M"></SizeBasedTriggeringPolicy>-->
             </Policies>
             <!--//日志文件夹下的文件数量超过max后会删除最旧的日志文件-->
-            <DefaultRolloverStrategy max="10"></DefaultRolloverStrategy>
+            <DefaultRolloverStrategy max="30"></DefaultRolloverStrategy>
         </RollingFile>
     </Appenders>
 

@@ -5,6 +5,8 @@ import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.SqlSessionFactoryBuilder;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.InputStream;
 
 public class Dao {
@@ -13,7 +15,8 @@ public class Dao {
     static {
         try {
             SqlSessionFactoryBuilder builder = new SqlSessionFactoryBuilder();
-            InputStream is = Resources.getResourceAsStream("mybatis.xml");
+            String path = System.getProperty("user.dir")+ File.separator+"config"+File.separator+"mybatis.xml";
+            InputStream is = new FileInputStream(new File(path));
             factory = builder.build(is);
         }catch (Exception e){
             e.printStackTrace();

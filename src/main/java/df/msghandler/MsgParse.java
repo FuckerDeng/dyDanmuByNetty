@@ -8,6 +8,8 @@ import df.bean.msgbean.DanmuMsg;
 import df.bean.msgbean.GiftMsg;
 import df.bean.msgbean.LoginMsg;
 import df.bean.msgbean.Msg;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
@@ -16,6 +18,7 @@ import java.util.Set;
 
 public class MsgParse extends Thread{
 
+    private Logger logger = LogManager.getLogger(MsgParse.class);
     @Override
     public void run() {
         while (true){
@@ -50,13 +53,13 @@ public class MsgParse extends Thread{
                 msg = new LoginMsg();
                 break;
             case "chatmsg":
-                msg = new DanmuMsg();
+//                msg = new DanmuMsg();
                 break;
             case "dgb":
                 msg = new GiftMsg();
                 break;
                 default:
-                    System.out.println("未处理的msg类型："+keyValues.get("type"));
+//                    logger.warn("未处理的msg类型："+keyValues.get("type"));
                     break;
 
         }

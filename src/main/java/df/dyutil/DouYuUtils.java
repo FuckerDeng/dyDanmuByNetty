@@ -3,6 +3,8 @@ package df.dyutil;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -11,6 +13,7 @@ import java.nio.charset.Charset;
 
 
 public class DouYuUtils {
+    private static Logger logger = LogManager.getLogger(DouYuUtils.class);
     /**
      * 登录斗鱼弹幕服务器
      * @param roomId
@@ -21,14 +24,14 @@ public class DouYuUtils {
 //        System.out.println(loginApi);
         byte[] resultData =sendData(loginApi);
         if(resultData == null){
-            System.out.println("发送数据编码失败！");
+            logger.error("发送数据编码失败！");
             return;
         }
         ByteBuf resultBuffer = Unpooled.wrappedBuffer(resultData);
         ctx.writeAndFlush(resultBuffer);
 //        resultBuffer.release();
 
-        System.out.println("发送登陆验证消息成功！");
+        logger.error("发送登陆验证消息成功！");
 
     }
 
@@ -39,7 +42,7 @@ public class DouYuUtils {
         ByteBuf joinBuffer = Unpooled.wrappedBuffer(joinByte);
         ctx.writeAndFlush(joinBuffer);
 //        joinBuffer.release();
-        System.out.println("加入分组成功!");
+        logger.error("加入分组成功!");
     }
 
     /**

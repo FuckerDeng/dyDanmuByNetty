@@ -7,6 +7,8 @@ import io.netty.buffer.ByteBufUtil;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import io.netty.util.CharsetUtil;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.List;
 import java.util.Properties;
@@ -15,6 +17,7 @@ import java.util.concurrent.TimeUnit;
 
 
 public class Byte2MsgStrHandler extends ByteToMessageDecoder {
+    private final Logger logger = LogManager.getLogger(Byte2MsgStrHandler.class);
 
     @Override
     protected void decode(ChannelHandlerContext channelHandlerContext, ByteBuf byteBuf, List<Object> list) throws Exception {
@@ -33,6 +36,7 @@ public class Byte2MsgStrHandler extends ByteToMessageDecoder {
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
 
+        logger.info("抓取的房间号为："+Config.roomId);
         //登录斗鱼弹幕服务器
         DouYuUtils.connectDouyuDanmu(Config.roomId,ctx);
 

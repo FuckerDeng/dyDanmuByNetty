@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+    <!--配置数据库连接（driver、url、username、password）-->
+    <environments default="mysql">
+        <!--开始配置mysql-->
+        <environment id="mysql">
+            <!--配置事务-->
+            <transactionManager type="JDBC"></transactionManager>
+            <!--配置数据源-->
+            <dataSource type="POOLED">
+                <property name="driver" value="com.mysql.cj.jdbc.Driver"></property>
+                <property name="url"
+                          value="jdbc:mysql://127.0.0.1:3306/douyu?characterEncoding=UTF-8&amp;serverTimezone=UTC&amp;useSSL=false&amp;autoReconnect=true&amp;allowMultiQueries=true"></property>
+                <property name="username" value="root"></property>
+                <property name="password" value="123456"></property>
+                <!--在url中设置autoReconnect=true，并且设置下面3项，项目会过一定时间检测，如果没有任何操作连接数据库，则会自动重连一次-->
+                <!--mysql服务端会默认检查每个连接connection，一旦发现connection被闲置8小时（wait_timeout），便会被断开。那我们可以在连接字符串中加入autoReconnect=true，同时配置下mybatis，一段时间又默认执行下简单的查询，表明自己这个连接还活着-->
+                <property name="poolPingEnabled" value="true"/>
+                <property name="poolPingQuery" value="select 1"/>
+                <property name="poolPingConnectionsNotUsedFor" value="3600000"/>
+
+            </dataSource>
+        </environment>
+
+    </environments>
+    <mappers>
+        <package name="df.db.mappers"></package>
+    </mappers>
+</configuration>

@@ -8,9 +8,13 @@ import df.bean.giftbean.GiftInfo;
 import df.bean.msgbean.GiftMsg;
 import df.bean.msgbean.Msg;
 import df.db.mappers.GiftrecordMapper;
+import df.dyutil.Config;
 import org.apache.ibatis.session.SqlSession;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class Msg2DbHandler extends Thread {
+    private Logger logger = LogManager.getLogger(Msg2DbHandler.class);
     @Override
     public void run() {
         while (true){
@@ -27,10 +31,12 @@ public class Msg2DbHandler extends Thread {
                 }
                 giftInfo = GiftManager.giftContainner.get(giftMsg.getGfid()+"");
                 if(giftInfo==null){
-                    System.out.printf("有礼物信息未获取到：%d  %s",giftMsg.getGfid());
+                    logger.info(String.format("有礼物信息未获取到：%d",giftMsg.getGfid()));
                     continue;
                 }
                 Giftrecord giftrecord = new Giftrecord();
+                giftrecord.setRid(Config.roomId);
+                giftrecord.setGfname(giftInfo.getName());
                 giftrecord.setGfid(giftMsg.getGfid());
                 giftrecord.setIsfree(giftInfo.getGiftType());
                 giftrecord.setUid(giftMsg.getUid());
@@ -46,16 +52,16 @@ public class Msg2DbHandler extends Thread {
                     mapper.insert(giftrecord);
                     sqlSession.commit();
                     if(giftrecord.getIsfree()==0){
-                        System.out.printf("%s  赠送免费礼物：%s  %d个\n",giftrecord.getNn(),giftrecord.getGfname(),giftrecord.getGfcnt());
+                        logger.info(String.format("%s  赠送免费礼物：%s  %d个",giftrecord.getNn(),giftrecord.getGfname(),giftrecord.getGfcnt()));
                     }else{
-                        System.out.printf("%s  赠送收费礼物：%s  %d个，价值 %d元\n",giftrecord.getNn(),giftrecord.getGfname(),giftrecord.getGfcnt(),giftrecord.getJiage());
+                        logger.info(String.format("%s  赠送收费礼物：%s  %d个，价值 %.2f元",giftrecord.getNn(),giftrecord.getGfname(),giftrecord.getGfcnt(),giftrecord.getJiage()));
                     }
 
                 }catch (Exception e){
                     sqlSession.rollback();
                     e.printStackTrace();
                 }finally {
-                    sqlSession.close();
+                    Dao.closeSession(sqlSession);
                 }
 
             }

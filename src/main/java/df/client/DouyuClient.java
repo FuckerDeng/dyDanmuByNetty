@@ -15,6 +15,8 @@ import io.netty.channel.nio.NioEventLoopGroup;
 
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.net.InetAddress;
 
@@ -23,6 +25,7 @@ public class DouyuClient {
     private InetAddress inetAddress;
     private int port = 8601;
     public Channel channel = null;
+    private Logger logger = LogManager.getLogger(DouyuClient.class);
 
     {
         try {
@@ -49,18 +52,21 @@ public class DouyuClient {
                         }
                     });
 
-            switch (MyUtil.getOs()){
-                case WINDOWS:
-                    group = new NioEventLoopGroup();
-                    bs.group(group).channel(NioSocketChannel.class);
-                    break;
-                case LINUX:
-                    group = new EpollEventLoopGroup();
-                    bs.group(group).channel(EpollSocketChannel.class);
-                case UNIDENTIFIED:
-                    System.out.println("无法识别的计算机系统！");
-                    break;
-            }
+//            switch (MyUtil.getOs()){
+//                case WINDOWS:
+//                    group = new NioEventLoopGroup();
+//                    bs.group(group).channel(NioSocketChannel.class);
+//                    break;
+//                case LINUX:
+//                    group = new EpollEventLoopGroup();
+//                    bs.group(group).channel(EpollSocketChannel.class);
+//                case UNIDENTIFIED:
+//                    logger.error("无法识别的计算机系统！");
+//                    System.exit(-1);
+//                    break;
+//            }
+            group = new NioEventLoopGroup();
+            bs.group(group).channel(NioSocketChannel.class);
 
             ChannelFuture f = bs.connect().sync();
             this.channel = f.channel();
