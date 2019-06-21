@@ -1,5 +1,5 @@
 # <center>斗鱼弹幕程序用netty框架实现
-
+![img](https://github.com/FuckerDeng/dyDanmuByNetty/blob/master/imgs/gift.gif)
 ### 程序运行
 ```
 1、下载可执行jar包：
