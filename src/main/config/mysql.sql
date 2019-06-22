@@ -40,3 +40,13 @@ CREATE TABLE `giftrecord` (
   `jiage` double DEFAULT NULL COMMENT '收费礼物值多少RMB',
   `gifttime` bigint(20) DEFAULT NULL COMMENT '收到礼物的时间'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+#创建礼物道具信息表
+CREATE TABLE `giftinfo` (
+  `id` varchar(10) NOT NULL COMMENT '礼物的id字符串形式',
+  `name` varchar(50) DEFAULT NULL COMMENT '礼物的名字',
+  `giftType` int(1) DEFAULT NULL COMMENT '0免费，1收费',
+  `price` double DEFAULT NULL COMMENT '价格，RMB',
+  `priceName` varchar(15) DEFAULT NULL COMMENT '价格的字符串描述',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8

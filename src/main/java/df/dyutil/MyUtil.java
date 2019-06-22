@@ -5,6 +5,7 @@ import org.apache.logging.log4j.Logger;
 import org.jsoup.Jsoup;
 
 import java.io.IOException;
+import java.time.LocalTime;
 
 public class MyUtil {
     private static final Logger logger = LogManager.getLogger(MyUtil.class);
@@ -35,7 +36,7 @@ public class MyUtil {
             while (k<=5){
                 try {
                     result = Jsoup.connect(url)
-                            .timeout(600000)
+                            .timeout(30000)
                             .ignoreContentType(true)
                             .header("user-agent", "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.86 Safari/537.36")
                             .execute().body();
@@ -54,4 +55,15 @@ public class MyUtil {
 
         return result;
     }
+
+
+    public static long leftTimeToday(){
+        LocalTime localTime = LocalTime.now();
+        int hour = localTime.getHour();
+        int minute = localTime.getMinute();
+        int second = localTime.getSecond();
+        return 24*60*60*1000-hour*60*60*1000-minute*60*1000-second;
+    }
+
+
 }

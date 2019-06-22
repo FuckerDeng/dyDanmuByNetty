@@ -2,9 +2,9 @@ package df.msghandler;
 
 import df.Manager.GiftManager;
 import df.Manager.MsgManger;
+import df.bean.giftbean.Giftinfo;
 import df.bean.giftbean.Giftrecord;
 import df.db.Dao;
-import df.bean.giftbean.GiftInfo;
 import df.bean.msgbean.GiftMsg;
 import df.bean.msgbean.Msg;
 import df.db.mappers.GiftrecordMapper;
@@ -25,20 +25,17 @@ public class Msg2DbHandler extends Thread {
 
             if(handedMsg.getType().equals("dgb")){
                 GiftMsg giftMsg = (GiftMsg) handedMsg;
-                GiftInfo giftInfo = GiftManager.giftContainner.get(giftMsg.getGfid()+"");
-                if(giftInfo ==null){
-                    GiftManager.initGiftMap();
-                }
+                Giftinfo giftInfo = GiftManager.giftContainner.get(giftMsg.getGfid()+"");
                 giftInfo = GiftManager.giftContainner.get(giftMsg.getGfid()+"");
                 if(giftInfo==null){
-                    logger.info(String.format("有礼物信息未获取到：%d",giftMsg.getGfid()));
+                    logger.info(String.format("无法识别的礼物id：%d",giftMsg.getGfid()));
                     continue;
                 }
                 Giftrecord giftrecord = new Giftrecord();
                 giftrecord.setRid(Config.roomId);
                 giftrecord.setGfname(giftInfo.getName());
                 giftrecord.setGfid(giftMsg.getGfid());
-                giftrecord.setIsfree(giftInfo.getGiftType());
+                giftrecord.setIsfree(giftInfo.getGifttype());
                 giftrecord.setUid(giftMsg.getUid());
                 giftrecord.setNn(giftMsg.getNn());
                 giftrecord.setLevel(giftMsg.getLevel());

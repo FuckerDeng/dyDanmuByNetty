@@ -3,11 +3,13 @@ package df;
 import df.Manager.GiftManager;
 import df.client.DouyuClient;
 import df.dyutil.MyUtil;
-import df.dyutil.OS;
 import df.msghandler.Msg2DbHandler;
 import df.msghandler.MsgParse;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import java.util.Timer;
+import java.util.TimerTask;
 
 
 /**
@@ -22,6 +24,17 @@ public class App
         try {
 
             initConfig();
+
+            //启动每隔24小时就刷新下礼物容器内容任务
+            new Timer("GiftManagerInitTask").scheduleAtFixedRate(new TimerTask() {
+                @Override
+                public void run() {
+                    GiftManager.GetGiftMap();
+                }
+            },MyUtil.leftTimeToday(),24*60*60*1000);
+            logger.info("任务：每天凌晨刷新奖励容器 启动成功！");
+
+
             //启动msg处理线程
             Thread msgHandlerTread = new MsgParse();
             msgHandlerTread.setDaemon(true);
@@ -54,6 +67,8 @@ public class App
     }
 
     private static void initConfig() {
-        GiftManager.initGiftMap();
+        GiftManager.GetGiftMap();
     }
+
+
 }

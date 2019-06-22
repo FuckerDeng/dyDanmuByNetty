@@ -26,7 +26,7 @@ public class Config {
 //            properties.load(GiftManager.class.getResourceAsStream("/config.properties"));
             properties.load(new FileInputStream(new File(path)));
             freeGiftUrl = properties.getProperty("freeGiftUrl");
-            moneyGiftUrl = properties.getProperty("moneyGift");
+            moneyGiftUrl = properties.getProperty("moneyGiftUrl");
             roomId = Integer.valueOf(properties.getProperty("roomId"));
             logger.info("加载配置文件完成！");
         } catch (IOException e) {

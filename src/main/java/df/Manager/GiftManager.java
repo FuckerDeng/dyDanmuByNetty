@@ -3,9 +3,12 @@ package df.Manager;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import df.bean.giftbean.Giftinfo;
+import df.db.Dao;
+import df.db.mappers.GiftinfoMapper;
 import df.dyutil.Config;
 import df.dyutil.MyUtil;
-import df.bean.giftbean.GiftInfo;
+import org.apache.ibatis.session.SqlSession;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -14,15 +17,24 @@ import java.util.*;
 public class GiftManager {
     private static Logger logger = LogManager.getLogger(GiftManager.class);
     //免费礼物的映射表
-    public static HashMap<String,GiftInfo> giftContainner = new HashMap<>();
+    public static HashMap<String,Giftinfo> giftContainner = new HashMap<>();
+    private static HashMap<String,Giftinfo> tempGiftContainner = new HashMap<>();
+    private static List<Giftinfo> toDB = new ArrayList<>();
+    private static boolean firstFromDb = true;
 
 
-    public static synchronized void initGiftMap (){
+    public static synchronized void GetGiftMap (){
         try {
+            if(firstFromDb){
+                logger.info("从数据库加载奖励道具信息！");
+                loadGiftFromDb();
+                firstFromDb = false;
+                return;
+            }
+
             logger.info("从网络获取斗鱼礼物信息！");
             String freeGiftStr = MyUtil.getHtml(Config.freeGiftUrl);
-            String moneyGiftStr = MyUtil.getHtml(Config.moneyGiftUrl);
-            if(freeGiftStr=="" || moneyGiftStr ==""){
+            if(freeGiftStr==""){
                 logger.error("获取免费礼物信息失败！程序退出。。");
                 System.exit(0);
             }
@@ -32,36 +44,118 @@ public class GiftManager {
 //            giftContainner.clear();
             while (freeData.hasNext()){
                 Map.Entry<String, Object> next = freeData.next();
-                GiftInfo gift = new GiftInfo();
+                Giftinfo gift = new Giftinfo();
                 JSONObject value = (JSONObject) (next.getValue());
                 gift.setId(next.getKey());
-                gift.setGiftType(0);
+                gift.setGifttype(0);
                 gift.setName(value.getString("name"));
-                giftContainner.put(next.getKey(),gift);
+//                logger.info("获取免费礼物信息：id-"+gift.getId()+"    name-"+gift.getName());
+                tempGiftContainner.put(next.getKey(),gift);
+                toDB.add(gift);
             }
-
-            moneyGiftStr = moneyGiftStr.substring(17,moneyGiftStr.length()-2);
+            String moneyGiftStr;
+            for(int i = 1 ;i<100;i++){
+                logger.info("抓取第 "+i+" 次礼物道具，总计100次！");
+                moneyGiftStr="";
+                String moneyGiftUrl = Config.moneyGiftUrl +getUrlIndex(i)+".json";
+                moneyGiftStr = MyUtil.getHtml(moneyGiftUrl);
+                moneyGiftStr = moneyGiftStr.substring(17,moneyGiftStr.length()-2);
 //            System.out.println(moneyGiftStr);
-            JSONObject moneyJson = JSON.parseObject(moneyGiftStr);
-            JSONArray moneyData = moneyJson.getJSONArray("data");
-            for(int i = 0;i<moneyData.size();i++){
-                JSONObject md = moneyData.getJSONObject(i);
-                GiftInfo gift = new GiftInfo();
-                gift.setId(md.getString("id")+"");
-                if(gift.getId().equals("20000")){
-                    gift.setGiftType(0);
-                }else{
-                    gift.setGiftType(1);
+                JSONObject moneyJson = JSON.parseObject(moneyGiftStr);
+                JSONArray moneyData = moneyJson.getJSONArray("data");
+                for(int j = 0;j<moneyData.size();j++){
+                    JSONObject md = moneyData.getJSONObject(j);
+                    Giftinfo gift = new Giftinfo();
+                    gift.setId(md.getString("id")+"");
+                    if(gift.getId().equals("20000") ||gift.getId().equals("20008") ){
+                        gift.setGifttype(0);
+                    }else{
+                        gift.setGifttype(1);
+                    }
+                    gift.setName(md.getString("name"));
+                    gift.setPricename(md.getString("price_name"));
+                    gift.setPrice(Double.valueOf(gift.getPricename().substring(0,gift.getPricename().length()-2)));
+
+                    Giftinfo giftInfo = tempGiftContainner.get(gift.getId());
+                    if(giftInfo == null){
+//                        logger.info("获取收费礼物信息：id-"+gift.getId()+"    name-"+gift.getName()+"    price-"+gift.getPricename());
+                        tempGiftContainner.put(gift.getId(),gift);
+                        toDB.add(gift);
+                    }else {
+                        if(!gift.compare(giftInfo)){
+//                            logger.info("获取收费礼物信息：id-"+gift.getId()+"    name-"+gift.getName()+"    price-"+gift.getPricename());
+                            tempGiftContainner.put(gift.getId(),gift);
+                            toDB.add(gift);
+                        }
+                    }
+
                 }
-                gift.setName(md.getString("name"));
-                gift.setPriceName(md.getString("price_name"));
-                gift.setPrice(Double.valueOf(gift.getPriceName().substring(0,gift.getPriceName().length()-2)));
-                giftContainner.put(gift.getId(),gift);
             }
-            logger.info("从网络获取斗鱼礼物信息成功并加入容器！");
+            initGiftMap();
+            gift2db();
+            logger.info("从网络获取斗鱼礼物信息成功并加入容器！共收集 "+giftContainner.size()+" 种礼物信息！");
+
         }catch (Exception e){
             e.printStackTrace();
         }
+
+    }
+
+    private static boolean loadGiftFromDb() {
+        SqlSession sqlSession = Dao.getSqlSession();
+        GiftinfoMapper mapper = sqlSession.getMapper(GiftinfoMapper.class);
+        try {
+            List<Giftinfo> giftinfos = mapper.selectAll();
+            sqlSession.commit();
+            if(giftinfos.size()>300){
+                giftContainner.clear();
+                giftinfos.stream().forEach(info->{
+                    giftContainner.put(info.getId(),info);
+                });
+                return true;
+            }
+            return false;
+        }catch (Exception e){
+            sqlSession.rollback();
+            e.printStackTrace();
+            return false;
+        }finally {
+            sqlSession.close();
+        }
+    }
+
+    public static String getUrlIndex(int i){
+        if(i<10){
+            return "2000" + i;
+        }else if(i<100){
+            return "200" + i;
+        }else {
+            return i+"";
+        }
+    }
+
+
+
+    public static synchronized void initGiftMap(){
+        giftContainner.clear();
+        giftContainner.putAll(tempGiftContainner);
+        tempGiftContainner.clear();
+    }
+
+    public static void gift2db(){
+        SqlSession sqlSession = Dao.getSqlSession();
+        GiftinfoMapper mapper = sqlSession.getMapper(GiftinfoMapper.class);
+        try {
+            mapper.truncateTable();
+            mapper.insertBatch(toDB);
+            sqlSession.commit();
+        }catch (Exception e){
+            sqlSession.rollback();
+            e.printStackTrace();
+        }finally {
+            sqlSession.close();
+        }
+
 
     }
 }

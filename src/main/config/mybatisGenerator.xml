@@ -49,10 +49,11 @@
         </javaClientGenerator>
 
         <!-- 指定数据表 -->
-        <table schema="" tableName="giftrecord"></table>
+        <!--<table schema="" tableName="giftrecord"></table>-->
         <!--<table schema="" tableName="groupinfo"></table>-->
         <!--<table schema="" tableName="roominfo"></table>-->
         <!--<table schema="" tableName="roomhotvalue"></table>-->
+        <table schema="" tableName="giftinfo"></table>
 
 
         <!-- 有些表的字段需要指定java类型
