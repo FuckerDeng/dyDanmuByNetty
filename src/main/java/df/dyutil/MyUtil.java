@@ -2,6 +2,7 @@ package df.dyutil;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jsoup.HttpStatusException;
 import org.jsoup.Jsoup;
 
 import java.io.IOException;
@@ -36,13 +37,18 @@ public class MyUtil {
             while (k<=5){
                 try {
                     result = Jsoup.connect(url)
-                            .timeout(30000)
+                            .timeout(20000)
                             .ignoreContentType(true)
                             .header("user-agent", "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.86 Safari/537.36")
                             .execute().body();
                     issuccess = true;
                     break;
-                } catch (IOException e) {
+                }catch (HttpStatusException ee){
+                    if(ee.getStatusCode()==404){
+                        issuccess = true;
+                        break;
+                    }
+                } catch (Exception e) {
                     logger.error("获取礼物数据失败，进行第 " +k+"次重试！");
                     e.printStackTrace();
                     continue;

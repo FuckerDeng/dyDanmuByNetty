@@ -27,9 +27,11 @@ public class GiftManager {
         try {
             if(firstFromDb){
                 logger.info("从数据库加载奖励道具信息！");
-                loadGiftFromDb();
+                boolean isInit = loadGiftFromDb();
                 firstFromDb = false;
-                return;
+                if(isInit){
+                    return;
+                }
             }
 
             logger.info("从网络获取斗鱼礼物信息！");
@@ -54,11 +56,14 @@ public class GiftManager {
                 toDB.add(gift);
             }
             String moneyGiftStr;
-            for(int i = 1 ;i<100;i++){
-                logger.info("抓取第 "+i+" 次礼物道具，总计100次！");
+            for(int i = 0 ;i<300;i++){
+                logger.info("抓取第 "+(i+1)+" 次礼物道具，总计300次！");
                 moneyGiftStr="";
                 String moneyGiftUrl = Config.moneyGiftUrl +getUrlIndex(i)+".json";
                 moneyGiftStr = MyUtil.getHtml(moneyGiftUrl);
+                if(moneyGiftStr.equals("")){
+                    continue;
+                }
                 moneyGiftStr = moneyGiftStr.substring(17,moneyGiftStr.length()-2);
 //            System.out.println(moneyGiftStr);
                 JSONObject moneyJson = JSON.parseObject(moneyGiftStr);
@@ -84,13 +89,18 @@ public class GiftManager {
                     }else {
                         if(!gift.compare(giftInfo)){
 //                            logger.info("获取收费礼物信息：id-"+gift.getId()+"    name-"+gift.getName()+"    price-"+gift.getPricename());
+                            logger.info("有礼物id冲突：id-"+gift.getId()+"\t新增为"+gift.getName()+"\t旧的为"+giftInfo.getName());
+                            giftInfo.setName(gift.getName());
+                            giftInfo.setGifttype(gift.getGifttype());
+                            giftInfo.setPricename(gift.getPricename());
+                            giftInfo.setPrice(gift.getPrice());
                             tempGiftContainner.put(gift.getId(),gift);
-                            toDB.add(gift);
                         }
                     }
 
                 }
             }
+            toDB.stream().forEach(gift -> System.out.println(gift));
             initGiftMap();
             gift2db();
             logger.info("从网络获取斗鱼礼物信息成功并加入容器！共收集 "+giftContainner.size()+" 种礼物信息！");

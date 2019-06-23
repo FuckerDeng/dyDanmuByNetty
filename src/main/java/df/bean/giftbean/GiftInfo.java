@@ -67,6 +67,17 @@ public class Giftinfo {
         this.pricename = pricename == null ? null : pricename.trim();
     }
 
+    @Override
+    public String toString() {
+        return "Giftinfo{" +
+                "id='" + id + '\'' +
+                ", name='" + name + '\'' +
+                ", gifttype=" + gifttype +
+                ", price=" + price +
+                ", pricename='" + pricename + '\'' +
+                '}';
+    }
+
     public boolean compare(Giftinfo giftInfo){
         if(this.getName().equals(giftInfo.getName()) & this.getPricename().equals(giftInfo.getPricename())){
             return true;
