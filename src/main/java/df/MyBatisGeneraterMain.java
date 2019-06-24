@@ -1,6 +1,7 @@
 package df;
 
 import df.Manager.GiftManager;
+import df.Manager.GiftManager2;
 import df.dyutil.MyUtil;
 //import org.mybatis.generator.api.MyBatisGenerator;
 //import org.mybatis.generator.config.Configuration;
@@ -15,7 +16,7 @@ public class MyBatisGeneraterMain {
     public static void main(String[] args) {
 
 //        GiftManager.initGiftMap();
-        GiftManager.GetGiftMap();
+        GiftManager2   .GetGiftMap();
     }
 
     public static void main1(String[] args) throws Exception{

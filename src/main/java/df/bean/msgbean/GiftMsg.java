@@ -15,7 +15,15 @@ public class GiftMsg extends Msg{
     //礼物个数：默认值为1（表示1个礼物）
     private int gfcnt;
 
+    private int bg;
 
+    public int getBg() {
+        return bg;
+    }
+
+    public void setBg(int bg) {
+        this.bg = bg;
+    }
 
     public int getRid() {
         return rid;
@@ -92,6 +100,7 @@ public class GiftMsg extends Msg{
                 ", ic='" + ic + '\'' +
                 ", level=" + level +
                 ", gfcnt=" + gfcnt +
+                ", bg=" + bg +
                 '}';
     }
 }

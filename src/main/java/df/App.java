@@ -23,7 +23,7 @@ public class App
     {
         try {
 
-            initConfig();
+//            initConfig();
 
             //启动每隔24小时就刷新下礼物容器内容任务
             new Timer("GiftManagerInitTask").scheduleAtFixedRate(new TimerTask() {
