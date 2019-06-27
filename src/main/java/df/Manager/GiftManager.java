@@ -17,10 +17,14 @@ import java.util.*;
 public class GiftManager {
     private static Logger logger = LogManager.getLogger(GiftManager.class);
     //免费礼物的映射表
-    public static HashMap<String,Giftinfo> giftContainner = new HashMap<>();
-    private static HashMap<String,Giftinfo> tempGiftContainner = new HashMap<>();
+    private static HashMap<String,Giftinfo> freeGiftContainner = new HashMap<>();
+    private static HashMap<String,Giftinfo> moneyGiftContainner = new HashMap<>();
+
+    public static HashMap<String,Giftinfo> tempFreeGiftContainner = new HashMap<>();
+    private static HashMap<String,Giftinfo> tempMoneyGiftContainner = new HashMap<>();
     private static List<Giftinfo> toDB = new ArrayList<>();
     private static boolean firstFromDb = true;
+    private static int giftNumm = 0;
 
 
     public static synchronized void GetGiftMap (){
@@ -30,6 +34,7 @@ public class GiftManager {
                 boolean isInit = loadGiftFromDb();
                 firstFromDb = false;
                 if(isInit){
+                    logger.info("从数据库加载礼物数量为："+giftNumm);
                     return;
                 }
             }
@@ -52,7 +57,8 @@ public class GiftManager {
                 gift.setGifttype(0);
                 gift.setName(value.getString("name"));
 //                logger.info("获取免费礼物信息：id-"+gift.getId()+"    name-"+gift.getName());
-                tempGiftContainner.put(next.getKey(),gift);
+                tempFreeGiftContainner.put(next.getKey(),gift);
+                giftNumm++;
                 toDB.add(gift);
             }
             String moneyGiftStr;
@@ -81,29 +87,34 @@ public class GiftManager {
                     gift.setPricename(md.getString("price_name"));
                     gift.setPrice(Double.valueOf(gift.getPricename().substring(0,gift.getPricename().length()-2)));
 
-                    Giftinfo giftInfo = tempGiftContainner.get(gift.getId());
+                    Giftinfo giftInfo = tempFreeGiftContainner.get(gift.getId());
                     if(giftInfo == null){
 //                        logger.info("获取收费礼物信息：id-"+gift.getId()+"    name-"+gift.getName()+"    price-"+gift.getPricename());
-                        tempGiftContainner.put(gift.getId(),gift);
+                        Giftinfo money2 = tempMoneyGiftContainner.get(gift.getId());
+                        if(!gift.compare(money2)){
+                            logger.error("非免费礼物中，同id不通价格： id="+giftInfo.getId()+"  price1="+gift.getPricename()+"  price2="+money2.getPricename());
+                        }
+                        tempMoneyGiftContainner.put(gift.getId(),gift);
+                        giftNumm++;
                         toDB.add(gift);
                     }else {
+
                         if(!gift.compare(giftInfo)){
 //                            logger.info("获取收费礼物信息：id-"+gift.getId()+"    name-"+gift.getName()+"    price-"+gift.getPricename());
                             logger.info("有礼物id冲突：id-"+gift.getId()+"\t新增为"+gift.getName()+"\t旧的为"+giftInfo.getName());
                             giftInfo.setName(gift.getName());
-                            giftInfo.setGifttype(gift.getGifttype());
+                            giftInfo.setGifttype(3);
                             giftInfo.setPricename(gift.getPricename());
                             giftInfo.setPrice(gift.getPrice());
-                            tempGiftContainner.put(gift.getId(),gift);
                         }
                     }
 
                 }
             }
-            toDB.stream().forEach(gift -> System.out.println(gift));
+            toDB.stream().forEach(gift -> logger.info(gift));
             initGiftMap();
             gift2db();
-            logger.info("从网络获取斗鱼礼物信息成功并加入容器！共收集 "+giftContainner.size()+" 种礼物信息！");
+            logger.info("从网络获取斗鱼礼物信息成功并加入容器！共收集 "+  giftNumm+" 种礼物信息！");
 
         }catch (Exception e){
             e.printStackTrace();
@@ -118,9 +129,16 @@ public class GiftManager {
             List<Giftinfo> giftinfos = mapper.selectAll();
             sqlSession.commit();
             if(giftinfos.size()>300){
-                giftContainner.clear();
+                freeGiftContainner.clear();
+                moneyGiftContainner.clear();
                 giftinfos.stream().forEach(info->{
-                    giftContainner.put(info.getId(),info);
+                    if(info.getGifttype()==0 || info.getGifttype()==3){
+                        freeGiftContainner.put(info.getId()+"",info);
+                        giftNumm++;
+                    }else {
+                        moneyGiftContainner.put(info.getId()+"",info);
+                        giftNumm++;
+                    }
                 });
                 return true;
             }
@@ -147,9 +165,14 @@ public class GiftManager {
 
 
     public static synchronized void initGiftMap(){
-        giftContainner.clear();
-        giftContainner.putAll(tempGiftContainner);
-        tempGiftContainner.clear();
+        freeGiftContainner.clear();
+        moneyGiftContainner.clear();
+        freeGiftContainner.putAll(tempFreeGiftContainner);
+        moneyGiftContainner.putAll(moneyGiftContainner);
+
+        tempFreeGiftContainner.clear();
+        tempMoneyGiftContainner.clear();
+        giftNumm = 0;
     }
 
     public static void gift2db(){

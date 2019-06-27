@@ -78,15 +78,20 @@ public class GiftManager2 {
 
                 }
             }
-            for(int i = 0;i<freeGiftContainner.size();i++){
-                Giftinfo free = freeGiftContainner.get(i);
-                for(int j = 0;i<moneyGiftContainner.size();j++){
-                    Giftinfo money = moneyGiftContainner.get(j);
-                    if(free.getName().equals(money.getName())){
+            Iterator<String> freeKeys = freeGiftContainner.keySet().iterator();
+            while (freeKeys.hasNext()){
+                String freeKey = freeKeys.next();
+                Giftinfo free = freeGiftContainner.get(freeKey);
+                Iterator<String> moneyKeys = moneyGiftContainner.keySet().iterator();
+                while (moneyKeys.hasNext()){
+                    String moneyKey = moneyKeys.next();
+                    Giftinfo money = moneyGiftContainner.get(moneyKey);
+                    if(free.getId().equals(money.getId())){
                         System.out.println("free-"+free.getId()+" "+free.getName()+"==money-"+money.getId()+" "+money.getName());
                     }
                 }
             }
+
             logger.info("从网络获取斗鱼礼物信息成功并加入容器！共收集 "+giftContainner.size()+" 种礼物信息！");
 
         }catch (Exception e){
