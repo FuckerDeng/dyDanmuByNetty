@@ -57,6 +57,7 @@ public class MsgParse extends Thread{
                 break;
             case "dgb":
                 msg = new GiftMsg();
+//                System.out.println(keyValues.toString());
                 break;
                 default:
 //                    logger.warn("未处理的msg类型："+keyValues.get("type"));

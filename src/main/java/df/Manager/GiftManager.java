@@ -17,8 +17,8 @@ import java.util.*;
 public class GiftManager {
     private static Logger logger = LogManager.getLogger(GiftManager.class);
     //免费礼物的映射表
-    private static HashMap<String,Giftinfo> freeGiftContainner = new HashMap<>();
-    private static HashMap<String,Giftinfo> moneyGiftContainner = new HashMap<>();
+    public static HashMap<String,Giftinfo> freeGiftContainner = new HashMap<>();
+    public static HashMap<String,Giftinfo> moneyGiftContainner = new HashMap<>();
 
     public static HashMap<String,Giftinfo> tempFreeGiftContainner = new HashMap<>();
     private static HashMap<String,Giftinfo> tempMoneyGiftContainner = new HashMap<>();
@@ -91,12 +91,15 @@ public class GiftManager {
                     if(giftInfo == null){
 //                        logger.info("获取收费礼物信息：id-"+gift.getId()+"    name-"+gift.getName()+"    price-"+gift.getPricename());
                         Giftinfo money2 = tempMoneyGiftContainner.get(gift.getId());
-                        if(!gift.compare(money2)){
+                        if(money2 == null){
+                            tempMoneyGiftContainner.put(gift.getId(),gift);
+                            giftNumm++;
+                            toDB.add(gift);
+
+                        }else if(money2!=null && !gift.compare(money2)){
                             logger.error("非免费礼物中，同id不通价格： id="+giftInfo.getId()+"  price1="+gift.getPricename()+"  price2="+money2.getPricename());
                         }
-                        tempMoneyGiftContainner.put(gift.getId(),gift);
-                        giftNumm++;
-                        toDB.add(gift);
+
                     }else {
 
                         if(!gift.compare(giftInfo)){
@@ -114,7 +117,7 @@ public class GiftManager {
             toDB.stream().forEach(gift -> logger.info(gift));
             initGiftMap();
             gift2db();
-            logger.info("从网络获取斗鱼礼物信息成功并加入容器！共收集 "+  giftNumm+" 种礼物信息！");
+
 
         }catch (Exception e){
             e.printStackTrace();
@@ -150,6 +153,7 @@ public class GiftManager {
         }finally {
             sqlSession.close();
         }
+
     }
 
     public static String getUrlIndex(int i){
@@ -172,6 +176,7 @@ public class GiftManager {
 
         tempFreeGiftContainner.clear();
         tempMoneyGiftContainner.clear();
+        logger.info("从网络获取斗鱼礼物信息成功并加入容器！共收集 "+  giftNumm+" 种礼物信息！");
         giftNumm = 0;
     }
 
@@ -184,6 +189,7 @@ public class GiftManager {
             sqlSession.commit();
         }catch (Exception e){
             sqlSession.rollback();
+            logger.error("网络获取的礼物道具信息入库失败！");
             e.printStackTrace();
         }finally {
             sqlSession.close();

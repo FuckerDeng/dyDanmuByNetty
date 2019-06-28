@@ -10,23 +10,7 @@ public class Giftinfo {
     private Double price;
 
     private String pricename;
-    public Giftinfo(){}
 
-    public Giftinfo(String id, String name, int giftType, String priceName) {
-        this.id = id;
-        this.name = name;
-        this.gifttype = giftType;
-        this.pricename = priceName;
-        this.price = Double.valueOf(priceName.substring(0,priceName.length()-2));
-    }
-
-    public Giftinfo(String id, String name, int giftType, String priceName, double price) {
-        this.id = id;
-        this.name = name;
-        this.gifttype = giftType;
-        this.pricename = priceName;
-        this.price = price;
-    }
     public String getId() {
         return id;
     }
@@ -78,8 +62,8 @@ public class Giftinfo {
                 '}';
     }
 
-    public boolean compare(Giftinfo giftInfo){
-        if(this.getName().equals(giftInfo.getName()) & this.getPricename().equals(giftInfo.getPricename())){
+    public boolean compare(Giftinfo giftinfo){
+        if(this.getName().equals(giftinfo.getName()) && this.getPricename().equals(giftinfo.getPricename())){
             return true;
         }else {
             return false;
